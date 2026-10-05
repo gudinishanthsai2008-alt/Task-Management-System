@@ -1,813 +1,2185 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Task Management System</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- Bootstrap 5 CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <!-- Bootstrap Icons -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <title>Task Management System</title>
 
-  <style>
-    :root {
-      --primary-color: #0d6efd;
-      --bg-color: #f8f9fa;
-      --sidebar-bg: #1e293b;
-    }
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    body {
-      background-color: var(--bg-color);
-      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-      min-height: 100vh;
-    }
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
 
-    /* --- LOGIN / REGISTER MODULE --- */
-    .auth-wrapper {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-    }
+    <style>
 
-    .auth-card {
-      width: 100%;
-      max-width: 420px;
-      padding: 30px;
-      border-radius: 12px;
-      background: #ffffff;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-    }
+        body {
+            background-color: #f8f9fa;
+            font-family: Arial, sans-serif;
+            min-height: 100vh;
+        }
 
-    /* --- LAYOUT & SIDEBAR --- */
-    .app-container {
-      display: none;
-      min-height: 100vh;
-    }
+        /* ================= LOGIN ================= */
 
-    .app-container.active {
-      display: flex;
-    }
+        #authSection {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+        }
 
-    .sidebar {
-      width: 280px;
-      background-color: var(--sidebar-bg);
-      color: #fff;
-      display: flex;
-      flex-direction: column;
-      flex-shrink: 0;
-    }
+        .auth-card {
+            width: 420px;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
 
-    .sidebar .nav-link {
-      color: #94a3b8;
-      border-radius: 6px;
-      margin-bottom: 4px;
-      transition: all 0.2s;
-    }
+        /* ================= APP ================= */
 
-    .sidebar .nav-link:hover, .sidebar .nav-link.active {
-      color: #ffffff;
-      background-color: #334155;
-    }
+        #appSection {
+            display: none;
+            min-height: 100vh;
+        }
 
-    .main-content {
-      flex-grow: 1;
-      overflow-y: auto;
-      height: 100vh;
-    }
+        #appSection.active {
+            display: flex;
+        }
 
-    /* --- DASHBOARD METRICS --- */
-    .metric-card {
-      border: none;
-      border-radius: 10px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-      transition: transform 0.2s;
-    }
+        .sidebar {
+            width: 270px;
+            min-height: 100vh;
+            background: #1e293b;
+            color: white;
+            padding: 20px;
+        }
 
-    .metric-card:hover {
-      transform: translateY(-3px);
-    }
+        .sidebar a {
+            color: #cbd5e1;
+            text-decoration: none;
+            display: block;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 5px;
+        }
 
-    /* --- KANBAN BOARD & DRAG-AND-DROP --- */
-    .board-column {
-      background-color: #e2e8f0;
-      border-radius: 10px;
-      padding: 16px;
-      min-height: 500px;
-    }
+        .sidebar a:hover,
+        .sidebar a.active {
+            background: #334155;
+            color: white;
+        }
 
-    .task-card {
-      background: #ffffff;
-      border: none;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-      margin-bottom: 12px;
-      cursor: grab;
-      transition: transform 0.15s, box-shadow 0.15s;
-    }
+        .main-content {
+            flex: 1;
+            padding: 25px;
+        }
 
-    .task-card:hover {
-      box-shadow: 0 5px 12px rgba(0,0,0,0.12);
-    }
+        /* ================= DASHBOARD ================= */
 
-    .task-card.dragging {
-      opacity: 0.4;
-    }
+        .metric-card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+        }
 
-    .badge-high { background-color: #dc3545; }
-    .badge-medium { background-color: #fd7e14; }
-    .badge-low { background-color: #0dcaf0; }
+        /* ================= TASK BOARD ================= */
 
-    /* --- TOAST NOTIFICATIONS --- */
-    .toast-container {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      z-index: 1100;
-    }
-  </style>
+        .board-column {
+            background: #e2e8f0;
+            padding: 15px;
+            border-radius: 10px;
+            min-height: 500px;
+        }
+
+        .task-card {
+            background: white;
+            padding: 15px;
+            margin-bottom: 12px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            cursor: grab;
+        }
+
+        .task-card:hover {
+            box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+        }
+
+        .progress {
+            height: 8px;
+        }
+
+        .priority-high {
+            background: #dc3545;
+        }
+
+        .priority-medium {
+            background: #fd7e14;
+        }
+
+        .priority-low {
+            background: #0dcaf0;
+        }
+
+        .toast-container {
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            z-index: 9999;
+        }
+
+    </style>
 </head>
+
 <body>
 
-  <!-- ==================== 1. USER AUTHENTICATION MODULE ==================== -->
-  <div class="auth-wrapper" id="authSection">
+
+<!-- ===================================================== -->
+<!--                    LOGIN / SIGN UP                    -->
+<!-- ===================================================== -->
+
+<div id="authSection">
+
     <div class="auth-card">
-      <div class="text-center mb-4">
-        <h3 class="fw-bold text-primary" id="authTitle"><i class="bi bi-check2-square"></i> Task System</h3>
-        <p class="text-muted small" id="authSubtitle">Please log in to manage your daily tasks</p>
-      </div>
 
-      <div class="alert alert-danger d-none" id="authAlert" role="alert"></div>
+        <div class="text-center mb-4">
 
-      <form id="authForm" novalidate onsubmit="UserModule.handleSubmit(event)">
-        <!-- Name Field (Visible in Sign Up mode only) -->
-        <div class="mb-3 d-none" id="nameGroup">
-          <label class="form-label">Full Name</label>
-          <input type="text" class="form-control" id="authName" placeholder="John Doe">
-          <div class="invalid-feedback">Please enter your name.</div>
+            <h3 class="fw-bold text-primary" id="authTitle">
+                <i class="bi bi-check2-square"></i>
+                Task System
+            </h3>
+
+            <p class="text-muted" id="authSubtitle">
+                Please log in to manage your tasks
+            </p>
+
         </div>
 
-        <div class="mb-3">
-          <label class="form-label">Email Address</label>
-          <input type="email" class="form-control" id="authEmail" placeholder="user@example.com" required>
-          <div class="invalid-feedback">Please provide a valid email address.</div>
+
+        <!-- Error Message -->
+
+        <div id="authAlert"
+             class="alert alert-danger d-none">
         </div>
 
-        <div class="mb-3">
-          <label class="form-label">Password</label>
-          <input type="password" class="form-control" id="authPassword" placeholder="••••••••" required minlength="6">
-          <div class="invalid-feedback">Password must be at least 6 characters long.</div>
-        </div>
 
-        <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold" id="authBtn">Login</button>
-      </form>
+        <!-- LOGIN / SIGNUP FORM -->
 
-      <div class="text-center mt-3 fs-7">
-        <span id="toggleText" class="text-muted">Don't have an account? </span>
-        <a href="#" onclick="UserModule.toggleMode(event)" id="toggleLink" class="text-decoration-none fw-bold">Sign Up</a>
-      </div>
-    </div>
-  </div>
+        <form id="authForm"
+              onsubmit="UserModule.handleSubmit(event)">
 
-  <!-- ==================== MAIN DASHBOARD LAYOUT ==================== -->
-  <div class="app-container" id="appSection">
-    
-    <!-- SIDEBAR / PROJECT MODULE -->
-    <div class="sidebar p-3">
-      <div class="d-flex align-items-center mb-4 px-2">
-        <i class="bi bi-kanban fs-3 text-primary me-2"></i>
-        <span class="fs-5 fw-bold">TaskMaster</span>
-      </div>
 
-      <div class="text-uppercase text-muted fs-8 fw-bold mb-2 px-2">Projects & Categories</div>
-      <ul class="nav nav-pills flex-column mb-auto" id="categoryList">
-        <li class="nav-item">
-          <a href="#" class="nav-link active" onclick="CategoryModule.filterCategory('All', event)">
-            <i class="bi bi-grid me-2"></i> All Projects
-          </a>
-        </li>
-        <li class="nav-item">
-          <a href="#" class="nav-link" onclick="CategoryModule.filterCategory('Website Redesign', event)">
-            <i class="bi bi-laptop me-2"></i> Website Redesign
-          </a>
-        </li>
-        <li class="nav-item">
-          <a href="#" class="nav-link" onclick="CategoryModule.filterCategory('Mobile App', event)">
-            <i class="bi bi-phone me-2"></i> Mobile App
-          </a>
-        </li>
-        <li class="nav-item">
-          <a href="#" class="nav-link" onclick="CategoryModule.filterCategory('Marketing', event)">
-            <i class="bi bi-megaphone me-2"></i> Marketing
-          </a>
-        </li>
-      </ul>
+            <!-- NAME -->
 
-      <hr class="text-secondary">
+            <div class="mb-3 d-none"
+                 id="nameGroup">
 
-      <!-- USER PROFILE FOOTER -->
-      <div class="d-flex align-items-center justify-content-between px-2">
-        <div class="d-flex align-items-center overflow-hidden me-2">
-          <div class="bg-primary text-white rounded-circle p-2 me-2 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;" id="userAvatar">U</div>
-          <div class="lh-1 overflow-hidden">
-            <div class="fw-bold text-truncate" id="userNameDisplay">User Name</div>
-            <span class="text-muted fs-8 text-truncate d-block" id="userEmailDisplay">user@example.com</span>
-          </div>
-        </div>
-        <button class="btn btn-outline-light btn-sm ms-2" title="Logout" onclick="UserModule.logout()">
-          <i class="bi bi-box-arrow-right"></i>
-        </button>
-      </div>
-    </div>
+                <label class="form-label">
+                    Full Name
+                </label>
 
-    <!-- MAIN WORKSPACE -->
-    <div class="main-content d-flex flex-column">
-      
-      <!-- HEADER -->
-      <header class="bg-white border-bottom px-4 py-3 d-flex justify-content-between align-items-center">
-        <div>
-          <h4 class="mb-0 fw-bold" id="currentCategoryTitle">All Projects</h4>
-          <small class="text-muted">Organize, track, and manage your daily workflow</small>
-        </div>
-        <button class="btn btn-primary" onclick="TaskCreationModule.openModal()">
-          <i class="bi bi-plus-lg me-1"></i> Create Task
-        </button>
-      </header>
+                <input type="text"
+                       id="authName"
+                       class="form-control"
+                       placeholder="Enter your name">
 
-      <div class="p-4">
-
-        <!-- ==================== 2. DASHBOARD & PROGRESS TRACKING MODULE ==================== -->
-        <div class="row g-3 mb-4">
-          <div class="col-md-3">
-            <div class="card metric-card p-3 bg-white">
-              <div class="d-flex justify-content-between align-items-center">
-                <div>
-                  <div class="text-muted fs-7 fw-semibold">TOTAL TASKS</div>
-                  <div class="fs-3 fw-bold" id="totalTasksCount">0</div>
-                </div>
-                <div class="bg-primary-subtle text-primary p-3 rounded-circle"><i class="bi bi-list-task fs-4"></i></div>
-              </div>
             </div>
-          </div>
 
-          <div class="col-md-3">
-            <div class="card metric-card p-3 bg-white">
-              <div class="d-flex justify-content-between align-items-center">
-                <div>
-                  <div class="text-muted fs-7 fw-semibold">COMPLETED</div>
-                  <div class="fs-3 fw-bold text-success" id="completedTasksCount">0</div>
-                </div>
-                <div class="bg-success-subtle text-success p-3 rounded-circle"><i class="bi bi-check-circle fs-4"></i></div>
-              </div>
-            </div>
-          </div>
 
-          <div class="col-md-3">
-            <div class="card metric-card p-3 bg-white">
-              <div class="d-flex justify-content-between align-items-center">
-                <div>
-                  <div class="text-muted fs-7 fw-semibold">IN PROGRESS</div>
-                  <div class="fs-3 fw-bold text-warning" id="pendingTasksCount">0</div>
-                </div>
-                <div class="bg-warning-subtle text-warning p-3 rounded-circle"><i class="bi bi-clock-history fs-4"></i></div>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-md-3">
-            <div class="card metric-card p-3 bg-white">
-              <div class="d-flex justify-content-between align-items-center">
-                <div>
-                  <div class="text-muted fs-7 fw-semibold">OVERDUE</div>
-                  <div class="fs-3 fw-bold text-danger" id="overdueTasksCount">0</div>
-                </div>
-                <div class="bg-danger-subtle text-danger p-3 rounded-circle"><i class="bi bi-exclamation-triangle fs-4"></i></div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- PROGRESS BAR OVERALL -->
-        <div class="card p-3 mb-4 border-0 shadow-sm">
-          <div class="d-flex justify-content-between mb-2 fs-7 fw-semibold">
-            <span>Overall Progress</span>
-            <span id="progressPercent">0%</span>
-          </div>
-          <div class="progress" style="height: 10px;">
-            <div class="progress-bar bg-success" id="overallProgressBar" role="progressbar" style="width: 0%"></div>
-          </div>
-        </div>
-
-        <!-- ==================== 3. TASK MANAGEMENT & DRAG-AND-DROP MODULE ==================== -->
-        <div class="row g-3">
-          <!-- Column: To Do -->
-          <div class="col-md-4">
-            <div class="board-column" ondragover="TaskManagementModule.allowDrop(event)" ondrop="TaskManagementModule.drop(event, 'todo')">
-              <div class="d-flex justify-content-between align-items-center mb-3">
-                <h6 class="fw-bold mb-0 text-secondary"><i class="bi bi-circle me-1"></i> TO DO</h6>
-                <span class="badge bg-secondary rounded-pill" id="todo-badge">0</span>
-              </div>
-              <div id="todo-list"></div>
-            </div>
-          </div>
-
-          <!-- Column: In Progress -->
-          <div class="col-md-4">
-            <div class="board-column" ondragover="TaskManagementModule.allowDrop(event)" ondrop="TaskManagementModule.drop(event, 'in-progress')">
-              <div class="d-flex justify-content-between align-items-center mb-3">
-                <h6 class="fw-bold mb-0 text-warning"><i class="bi bi-hourglass-split me-1"></i> IN PROGRESS</h6>
-                <span class="badge bg-warning rounded-pill" id="in-progress-badge">0</span>
-              </div>
-              <div id="in-progress-list"></div>
-            </div>
-          </div>
-
-          <!-- Column: Completed -->
-          <div class="col-md-4">
-            <div class="board-column" ondragover="TaskManagementModule.allowDrop(event)" ondrop="TaskManagementModule.drop(event, 'completed')">
-              <div class="d-flex justify-content-between align-items-center mb-3">
-                <h6 class="fw-bold mb-0 text-success"><i class="bi bi-check-circle-fill me-1"></i> COMPLETED</h6>
-                <span class="badge bg-success rounded-pill" id="completed-badge">0</span>
-              </div>
-              <div id="completed-list"></div>
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </div>
-
-  <!-- ==================== 4. TASK CREATION / EDIT MODAL MODULE ==================== -->
-  <div class="modal fade" id="taskModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title fw-bold" id="modalTitle">Create New Task</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <form id="taskForm" onsubmit="TaskCreationModule.saveTask(event)">
-          <div class="modal-body">
-            <input type="hidden" id="taskId">
+            <!-- EMAIL -->
 
             <div class="mb-3">
-              <label class="form-label fw-semibold">Task Title</label>
-              <input type="text" class="form-control" id="taskTitleInput" placeholder="e.g. Fix login validation bug" required>
+
+                <label class="form-label">
+                    Email Address
+                </label>
+
+                <input type="email"
+                       id="authEmail"
+                       class="form-control"
+                       placeholder="example@gmail.com"
+                       required>
+
             </div>
+
+
+            <!-- PASSWORD -->
 
             <div class="mb-3">
-              <label class="form-label fw-semibold">Description</label>
-              <textarea class="form-control" id="taskDescInput" rows="3" placeholder="Add task details or notes..."></textarea>
+
+                <label class="form-label">
+                    Password
+                </label>
+
+                <input type="password"
+                       id="authPassword"
+                       class="form-control"
+                       placeholder="Enter password"
+                       minlength="6"
+                       required>
+
             </div>
 
-            <div class="row g-2 mb-3">
-              <div class="col-md-6">
-                <label class="form-label fw-semibold">Category / Project</label>
-                <select class="form-select" id="taskCategoryInput" required>
-                  <option value="Website Redesign">Website Redesign</option>
-                  <option value="Mobile App">Mobile App</option>
-                  <option value="Marketing">Marketing</option>
-                </select>
-              </div>
-              <div class="col-md-6">
-                <label class="form-label fw-semibold">Priority</label>
-                <select class="form-select" id="taskPriorityInput" required>
-                  <option value="Low">Low</option>
-                  <option value="Medium" selected>Medium</option>
-                  <option value="High">High</option>
-                </select>
-              </div>
-            </div>
 
-            <div class="mb-3">
-              <label class="form-label fw-semibold">Deadline</label>
-              <input type="date" class="form-control" id="taskDeadlineInput" required>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
-            <button type="submit" class="btn btn-primary" id="saveTaskBtn">Save Task</button>
-          </div>
+            <button type="submit"
+                    class="btn btn-primary w-100"
+                    id="authBtn">
+
+                Login
+
+            </button>
+
         </form>
-      </div>
+
+
+        <!-- SWITCH LOGIN / SIGNUP -->
+
+        <div class="text-center mt-3">
+
+            <span id="toggleText">
+                Don't have an account?
+            </span>
+
+            <a href="#"
+               id="toggleLink"
+               onclick="UserModule.toggleMode(event)"
+               class="fw-bold">
+
+                Sign Up
+
+            </a>
+
+        </div>
+
     </div>
-  </div>
 
-  <!-- ==================== 5. DEADLINE NOTIFICATION MODULE (TOASTS) ==================== -->
-  <div class="toast-container" id="toastContainer"></div>
+</div>
 
-  <!-- Bootstrap JS Bundle -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-  <!-- APPLICATION LOGIC -->
-  <script>
-    const USERS_KEY = 'tms_users';
-    const SESSION_KEY = 'tms_session';
-    const TASKS_KEY = 'tms_tasks';
 
-    let currentUser = null;
-    let tasks = [];
-    let selectedCategory = 'All';
-    let taskModal = null;
+<!-- ===================================================== -->
+<!--                    MAIN APPLICATION                   -->
+<!-- ===================================================== -->
 
-    document.addEventListener('DOMContentLoaded', () => {
-      taskModal = new bootstrap.Modal(document.getElementById('taskModal'));
-      UserModule.checkSession();
-    });
+<div id="appSection">
 
-    /* ==================== USER MODULE (LOGIN VALIDATION & REGISTRATION) ==================== */
-    const UserModule = (() => {
-      let isSignUp = false;
 
-      function toggleMode(e) {
-        e.preventDefault();
-        isSignUp = !isSignUp;
+    <!-- ================= SIDEBAR ================= -->
 
-        const authTitle = document.getElementById('authTitle');
-        const authSubtitle = document.getElementById('authSubtitle');
-        const authBtn = document.getElementById('authBtn');
-        const nameGroup = document.getElementById('nameGroup');
-        const toggleText = document.getElementById('toggleText');
-        const toggleLink = document.getElementById('toggleLink');
+    <div class="sidebar">
 
-        document.getElementById('authAlert').classList.add('d-none');
-        document.getElementById('authForm').reset();
-        document.getElementById('authForm').classList.remove('was-validated');
+        <h4 class="mb-4">
 
-        if (isSignUp) {
-          authTitle.innerHTML = '<i class="bi bi-person-plus"></i> Create Account';
-          authSubtitle.textContent = 'Register to start creating and tracking your tasks';
-          authBtn.textContent = 'Register';
-          nameGroup.classList.remove('d-none');
-          document.getElementById('authName').required = true;
-          toggleText.textContent = 'Already have an account? ';
-          toggleLink.textContent = 'Login';
-        } else {
-          authTitle.innerHTML = '<i class="bi bi-check2-square"></i> Task System';
-          authSubtitle.textContent = 'Please log in to manage your daily tasks';
-          authBtn.textContent = 'Login';
-          nameGroup.classList.add('d-none');
-          document.getElementById('authName').required = false;
-          toggleText.textContent = "Don't have an account? ";
-          toggleLink.textContent = 'Sign Up';
+            <i class="bi bi-kanban"></i>
+            TaskMaster
+
+        </h4>
+
+
+        <p class="text-secondary">
+            PROJECTS & CATEGORIES
+        </p>
+
+
+        <a href="#"
+           class="active"
+           onclick="CategoryModule.filterCategory('All',event)">
+
+            <i class="bi bi-grid"></i>
+            All Projects
+
+        </a>
+
+
+        <a href="#"
+           onclick="CategoryModule.filterCategory('Website Redesign',event)">
+
+            <i class="bi bi-laptop"></i>
+            Website Redesign
+
+        </a>
+
+
+        <a href="#"
+           onclick="CategoryModule.filterCategory('Mobile App',event)">
+
+            <i class="bi bi-phone"></i>
+            Mobile App
+
+        </a>
+
+
+        <a href="#"
+           onclick="CategoryModule.filterCategory('Marketing',event)">
+
+            <i class="bi bi-megaphone"></i>
+            Marketing
+
+        </a>
+
+
+        <hr>
+
+
+        <!-- USER -->
+
+        <div class="mt-auto">
+
+            <div class="mb-2">
+
+                <strong id="userNameDisplay">
+                    User
+                </strong>
+
+                <br>
+
+                <small id="userEmailDisplay">
+                    user@example.com
+                </small>
+
+            </div>
+
+
+            <button class="btn btn-outline-light btn-sm"
+                    onclick="UserModule.logout()">
+
+                <i class="bi bi-box-arrow-right"></i>
+                Logout
+
+            </button>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- ================= MAIN CONTENT ================= -->
+
+    <div class="main-content">
+
+
+        <!-- HEADER -->
+
+        <div class="d-flex justify-content-between
+                    align-items-center mb-4">
+
+            <div>
+
+                <h3 id="currentCategoryTitle">
+                    All Projects
+                </h3>
+
+                <p class="text-muted">
+                    Organize, track and complete your tasks
+                </p>
+
+            </div>
+
+
+            <button class="btn btn-primary"
+                    onclick="TaskCreationModule.openModal()">
+
+                <i class="bi bi-plus-lg"></i>
+                Create Task
+
+            </button>
+
+        </div>
+
+
+
+        <!-- ================= METRICS ================= -->
+
+        <div class="row g-3 mb-4">
+
+
+            <div class="col-md-3">
+
+                <div class="card metric-card p-3">
+
+                    <small>
+                        TOTAL TASKS
+                    </small>
+
+                    <h3 id="totalTasksCount">
+                        0
+                    </h3>
+
+                </div>
+
+            </div>
+
+
+            <div class="col-md-3">
+
+                <div class="card metric-card p-3">
+
+                    <small>
+                        COMPLETED
+                    </small>
+
+                    <h3 class="text-success"
+                        id="completedTasksCount">
+
+                        0
+
+                    </h3>
+
+                </div>
+
+            </div>
+
+
+            <div class="col-md-3">
+
+                <div class="card metric-card p-3">
+
+                    <small>
+                        IN PROGRESS
+                    </small>
+
+                    <h3 class="text-warning"
+                        id="pendingTasksCount">
+
+                        0
+
+                    </h3>
+
+                </div>
+
+            </div>
+
+
+            <div class="col-md-3">
+
+                <div class="card metric-card p-3">
+
+                    <small>
+                        OVERDUE
+                    </small>
+
+                    <h3 class="text-danger"
+                        id="overdueTasksCount">
+
+                        0
+
+                    </h3>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- ================= OVERALL PROGRESS ================= -->
+
+        <div class="card p-3 mb-4">
+
+            <div class="d-flex justify-content-between">
+
+                <strong>
+                    Overall Progress
+                </strong>
+
+                <strong id="progressPercent">
+                    0%
+                </strong>
+
+            </div>
+
+
+            <div class="progress mt-2">
+
+                <div id="overallProgressBar"
+                     class="progress-bar bg-success"
+                     style="width:0%">
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- ================================================= -->
+        <!--                    TASK BOARD                     -->
+        <!-- ================================================= -->
+
+        <div class="row g-3">
+
+
+            <!-- ================= TO DO ================= -->
+
+            <div class="col-md-4">
+
+                <div class="board-column"
+                     ondragover="TaskManagementModule.allowDrop(event)"
+                     ondrop="TaskManagementModule.drop(event,'todo')">
+
+                    <div class="d-flex justify-content-between mb-3">
+
+                        <h5>
+                            <i class="bi bi-circle"></i>
+                            TO DO
+                        </h5>
+
+                        <span class="badge bg-secondary"
+                              id="todo-badge">
+
+                            0
+
+                        </span>
+
+                    </div>
+
+
+                    <div id="todo-list"></div>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- ================= IN PROGRESS ================= -->
+
+            <div class="col-md-4">
+
+                <div class="board-column"
+                     ondragover="TaskManagementModule.allowDrop(event)"
+                     ondrop="TaskManagementModule.drop(event,'in-progress')">
+
+                    <div class="d-flex justify-content-between mb-3">
+
+                        <h5 class="text-warning">
+
+                            <i class="bi bi-hourglass-split"></i>
+
+                            IN PROGRESS
+
+                        </h5>
+
+                        <span class="badge bg-warning"
+                              id="in-progress-badge">
+
+                            0
+
+                        </span>
+
+                    </div>
+
+
+                    <div id="in-progress-list"></div>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- ================= COMPLETED ================= -->
+
+            <div class="col-md-4">
+
+                <div class="board-column"
+                     ondragover="TaskManagementModule.allowDrop(event)"
+                     ondrop="TaskManagementModule.drop(event,'completed')">
+
+                    <div class="d-flex justify-content-between mb-3">
+
+                        <h5 class="text-success">
+
+                            <i class="bi bi-check-circle"></i>
+
+                            COMPLETED
+
+                        </h5>
+
+                        <span class="badge bg-success"
+                              id="completed-badge">
+
+                            0
+
+                        </span>
+
+                    </div>
+
+
+                    <div id="completed-list"></div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- ===================================================== -->
+<!--                     TASK MODAL                        -->
+<!-- ===================================================== -->
+
+<div class="modal fade"
+     id="taskModal">
+
+    <div class="modal-dialog">
+
+        <div class="modal-content">
+
+
+            <div class="modal-header">
+
+                <h5 id="modalTitle">
+                    Create New Task
+                </h5>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal">
+                </button>
+
+            </div>
+
+
+            <form id="taskForm"
+                  onsubmit="TaskCreationModule.saveTask(event)">
+
+                <div class="modal-body">
+
+
+                    <input type="hidden"
+                           id="taskId">
+
+
+                    <!-- TITLE -->
+
+                    <div class="mb-3">
+
+                        <label class="form-label">
+                            Task Title
+                        </label>
+
+                        <input type="text"
+                               id="taskTitleInput"
+                               class="form-control"
+                               required>
+
+                    </div>
+
+
+                    <!-- DESCRIPTION -->
+
+                    <div class="mb-3">
+
+                        <label class="form-label">
+                            Description
+                        </label>
+
+                        <textarea id="taskDescInput"
+                                  class="form-control"
+                                  rows="3">
+                        </textarea>
+
+                    </div>
+
+
+                    <!-- CATEGORY -->
+
+                    <div class="mb-3">
+
+                        <label class="form-label">
+                            Category
+                        </label>
+
+                        <select id="taskCategoryInput"
+                                class="form-select">
+
+                            <option>
+                                Website Redesign
+                            </option>
+
+                            <option>
+                                Mobile App
+                            </option>
+
+                            <option>
+                                Marketing
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- PRIORITY -->
+
+                    <div class="mb-3">
+
+                        <label class="form-label">
+                            Priority
+                        </label>
+
+                        <select id="taskPriorityInput"
+                                class="form-select">
+
+                            <option value="Low">
+                                Low
+                            </option>
+
+                            <option value="Medium"
+                                    selected>
+
+                                Medium
+
+                            </option>
+
+                            <option value="High">
+                                High
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- DEADLINE -->
+
+                    <div class="mb-3">
+
+                        <label class="form-label">
+                            Deadline
+                        </label>
+
+                        <input type="date"
+                               id="taskDeadlineInput"
+                               class="form-control"
+                               required>
+
+                    </div>
+
+                </div>
+
+
+                <div class="modal-footer">
+
+                    <button type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal">
+
+                        Cancel
+
+                    </button>
+
+
+                    <button type="submit"
+                            class="btn btn-primary">
+
+                        Save Task
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- Toast -->
+
+<div id="toastContainer"
+     class="toast-container">
+</div>
+
+
+
+<!-- Bootstrap JS -->
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js">
+</script>
+
+
+
+<script>
+
+/* =========================================================
+                       GLOBAL VARIABLES
+========================================================= */
+
+const USERS_KEY = "task_users";
+const SESSION_KEY = "task_session";
+const TASKS_KEY = "task_tasks";
+
+let currentUser = null;
+let tasks = [];
+let selectedCategory = "All";
+
+let taskModal;
+
+
+
+/* =========================================================
+                       PAGE START
+========================================================= */
+
+document.addEventListener("DOMContentLoaded", function() {
+
+    taskModal = new bootstrap.Modal(
+        document.getElementById("taskModal")
+    );
+
+    UserModule.checkSession();
+
+});
+
+
+
+/* =========================================================
+                       USER MODULE
+========================================================= */
+
+const UserModule = (() => {
+
+    let signupMode = false;
+
+
+    function toggleMode(event) {
+
+        event.preventDefault();
+
+        signupMode = !signupMode;
+
+        const nameGroup =
+            document.getElementById("nameGroup");
+
+        const authTitle =
+            document.getElementById("authTitle");
+
+        const authSubtitle =
+            document.getElementById("authSubtitle");
+
+        const authBtn =
+            document.getElementById("authBtn");
+
+        const toggleText =
+            document.getElementById("toggleText");
+
+        const toggleLink =
+            document.getElementById("toggleLink");
+
+        const alert =
+            document.getElementById("authAlert");
+
+
+        alert.classList.add("d-none");
+
+        document.getElementById("authForm").reset();
+
+
+        if (signupMode) {
+
+            authTitle.innerHTML =
+                '<i class="bi bi-person-plus"></i> Create Account';
+
+            authSubtitle.textContent =
+                "Register to start managing your tasks";
+
+            authBtn.textContent =
+                "Sign Up";
+
+            nameGroup.classList.remove("d-none");
+
+            document.getElementById("authName").required =
+                true;
+
+            toggleText.textContent =
+                "Already have an account? ";
+
+            toggleLink.textContent =
+                "Login";
+
         }
-      }
 
-      function handleSubmit(e) {
-        e.preventDefault();
-        const form = document.getElementById('authForm');
-        const alertEl = document.getElementById('authAlert');
+        else {
 
-        if (!form.checkValidity()) {
-          e.stopPropagation();
-          form.classList.add('was-validated');
-          return;
+            authTitle.innerHTML =
+                '<i class="bi bi-check2-square"></i> Task System';
+
+            authSubtitle.textContent =
+                "Please log in to manage your tasks";
+
+            authBtn.textContent =
+                "Login";
+
+            nameGroup.classList.add("d-none");
+
+            document.getElementById("authName").required =
+                false;
+
+            toggleText.textContent =
+                "Don't have an account? ";
+
+            toggleLink.textContent =
+                "Sign Up";
+
         }
 
-        const email = document.getElementById('authEmail').value.trim();
-        const password = document.getElementById('authPassword').value;
-        const name = document.getElementById('authName').value.trim();
+    }
 
-        const users = JSON.parse(localStorage.getItem(USERS_KEY)) || {};
 
-        if (isSignUp) {
-          if (users[email]) {
-            showAlert('User with this email already exists.');
-            return;
-          }
-          users[email] = { name: name || 'User', password };
-          localStorage.setItem(USERS_KEY, JSON.stringify(users));
 
-          // Auto login after sign up
-          loginSuccess({ email, name: users[email].name });
-        } else {
-          // Login Validation
-          if (!users[email] || users[email].password !== password) {
-            showAlert('Invalid email address or password.');
-            return;
-          }
-          loginSuccess({ email, name: users[email].name });
+    function handleSubmit(event) {
+
+        event.preventDefault();
+
+
+        const email =
+            document.getElementById("authEmail").value.trim();
+
+        const password =
+            document.getElementById("authPassword").value;
+
+        const name =
+            document.getElementById("authName").value.trim();
+
+
+        let users =
+            JSON.parse(localStorage.getItem(USERS_KEY)) || {};
+
+
+        /* ================= SIGN UP ================= */
+
+        if (signupMode) {
+
+            if (users[email]) {
+
+                showAlert(
+                    "This email is already registered."
+                );
+
+                return;
+
+            }
+
+
+            users[email] = {
+
+                name:
+                    name || "User",
+
+                password:
+                    password
+
+            };
+
+
+            localStorage.setItem(
+                USERS_KEY,
+                JSON.stringify(users)
+            );
+
+
+            loginSuccess({
+
+                email: email,
+
+                name: users[email].name
+
+            });
+
         }
-      }
 
-      function showAlert(msg) {
-        const alertEl = document.getElementById('authAlert');
-        alertEl.textContent = msg;
-        alertEl.classList.remove('d-none');
-      }
 
-      function loginSuccess(user) {
+        /* ================= LOGIN ================= */
+
+        else {
+
+            if (
+                !users[email] ||
+                users[email].password !== password
+            ) {
+
+                showAlert(
+                    "Invalid email or password."
+                );
+
+                return;
+
+            }
+
+
+            loginSuccess({
+
+                email: email,
+
+                name: users[email].name
+
+            });
+
+        }
+
+    }
+
+
+
+    function showAlert(message) {
+
+        const alert =
+            document.getElementById("authAlert");
+
+        alert.textContent = message;
+
+        alert.classList.remove("d-none");
+
+    }
+
+
+
+    function loginSuccess(user) {
+
         currentUser = user;
-        localStorage.setItem(SESSION_KEY, JSON.stringify(currentUser));
 
-        document.getElementById('authSection').style.display = 'none';
-        document.getElementById('appSection').classList.add('active');
 
-        document.getElementById('userNameDisplay').textContent = currentUser.name;
-        document.getElementById('userEmailDisplay').textContent = currentUser.email;
-        document.getElementById('userAvatar').textContent = currentUser.name.charAt(0).toUpperCase();
+        localStorage.setItem(
+            SESSION_KEY,
+            JSON.stringify(user)
+        );
+
+
+        /* IMPORTANT:
+           Hide login screen */
+
+        document.getElementById(
+            "authSection"
+        ).style.display = "none";
+
+
+        /* IMPORTANT:
+           Show dashboard */
+
+        document.getElementById(
+            "appSection"
+        ).classList.add("active");
+
+
+        document.getElementById(
+            "userNameDisplay"
+        ).textContent = user.name;
+
+
+        document.getElementById(
+            "userEmailDisplay"
+        ).textContent = user.email;
+
 
         TaskManagementModule.init();
-        NotificationModule.checkNotifications();
-      }
 
-      function logout() {
-        localStorage.removeItem(SESSION_KEY);
+    }
+
+
+
+    function logout() {
+
+        localStorage.removeItem(
+            SESSION_KEY
+        );
+
         currentUser = null;
-        document.getElementById('appSection').classList.remove('active');
-        document.getElementById('authSection').style.display = 'flex';
-        document.getElementById('authForm').reset();
-        document.getElementById('authForm').classList.remove('was-validated');
-      }
 
-      function checkSession() {
-        const savedSession = localStorage.getItem(SESSION_KEY);
-        if (savedSession) {
-          loginSuccess(JSON.parse(savedSession));
+
+        /* Hide dashboard */
+
+        document.getElementById(
+            "appSection"
+        ).classList.remove("active");
+
+
+        /* Show login */
+
+        document.getElementById(
+            "authSection"
+        ).style.display = "flex";
+
+
+        document.getElementById(
+            "authForm"
+        ).reset();
+
+    }
+
+
+
+    function checkSession() {
+
+        const saved =
+            localStorage.getItem(SESSION_KEY);
+
+
+        /* If logged in */
+
+        if (saved) {
+
+            loginSuccess(
+                JSON.parse(saved)
+            );
+
         }
-      }
 
-      return { toggleMode, handleSubmit, logout, checkSession };
-    })();
+        /* If NOT logged in,
+           dashboard remains hidden */
 
-    /* ==================== PROJECT / CATEGORY MODULE ==================== */
-    const CategoryModule = (() => {
-      function filterCategory(cat, e) {
-        if (e) e.preventDefault();
-        selectedCategory = cat;
+    }
 
-        document.getElementById('currentCategoryTitle').textContent = cat === 'All' ? 'All Projects' : cat;
 
-        const navLinks = document.querySelectorAll('#categoryList .nav-link');
-        navLinks.forEach(link => {
-          if (link.textContent.trim().includes(cat === 'All' ? 'All Projects' : cat)) {
-            link.classList.add('active');
-          } else {
-            link.classList.remove('active');
-          }
+    return {
+
+        toggleMode,
+        handleSubmit,
+        logout,
+        checkSession
+
+    };
+
+})();
+
+
+
+/* =========================================================
+                    CATEGORY MODULE
+========================================================= */
+
+const CategoryModule = (() => {
+
+
+    function filterCategory(category, event) {
+
+        event.preventDefault();
+
+        selectedCategory = category;
+
+
+        document.getElementById(
+            "currentCategoryTitle"
+        ).textContent =
+            category === "All"
+                ? "All Projects"
+                : category;
+
+
+        document.querySelectorAll(
+            ".sidebar a"
+        ).forEach(link => {
+
+            link.classList.remove("active");
+
         });
 
+
+        event.currentTarget.classList.add("active");
+
+
         TaskManagementModule.renderTasks();
-      }
 
-      return { filterCategory };
-    })();
+    }
 
-    /* ==================== TASK CREATION & EDITING MODULE ==================== */
-    const TaskCreationModule = (() => {
-      function openModal(taskId = null) {
-        const form = document.getElementById('taskForm');
-        form.reset();
+
+    return {
+
+        filterCategory
+
+    };
+
+})();
+
+
+
+/* =========================================================
+                    TASK CREATION MODULE
+========================================================= */
+
+const TaskCreationModule = (() => {
+
+
+    function openModal(taskId = null) {
+
+        document.getElementById(
+            "taskForm"
+        ).reset();
+
 
         if (taskId) {
-          const task = tasks.find(t => t.id === taskId);
-          if (task) {
-            document.getElementById('taskId').value = task.id;
-            document.getElementById('taskTitleInput').value = task.title;
-            document.getElementById('taskDescInput').value = task.description || '';
-            document.getElementById('taskCategoryInput').value = task.category;
-            document.getElementById('taskPriorityInput').value = task.priority;
-            document.getElementById('taskDeadlineInput').value = task.deadline;
-            document.getElementById('modalTitle').textContent = 'Edit Task';
-          }
-        } else {
-          document.getElementById('taskId').value = '';
-          document.getElementById('modalTitle').textContent = 'Create New Task';
+
+            const task =
+                tasks.find(
+                    t => t.id === taskId
+                );
+
+
+            if (!task) return;
+
+
+            document.getElementById(
+                "taskId"
+            ).value = task.id;
+
+
+            document.getElementById(
+                "taskTitleInput"
+            ).value = task.title;
+
+
+            document.getElementById(
+                "taskDescInput"
+            ).value = task.description;
+
+
+            document.getElementById(
+                "taskCategoryInput"
+            ).value = task.category;
+
+
+            document.getElementById(
+                "taskPriorityInput"
+            ).value = task.priority;
+
+
+            document.getElementById(
+                "taskDeadlineInput"
+            ).value = task.deadline;
+
+
+            document.getElementById(
+                "modalTitle"
+            ).textContent =
+                "Edit Task";
+
         }
+
+        else {
+
+            document.getElementById(
+                "taskId"
+            ).value = "";
+
+
+            document.getElementById(
+                "modalTitle"
+            ).textContent =
+                "Create New Task";
+
+        }
+
 
         taskModal.show();
-      }
 
-      function saveTask(e) {
-        e.preventDefault();
-        const id = document.getElementById('taskId').value;
-        const title = document.getElementById('taskTitleInput').value.trim();
-        const description = document.getElementById('taskDescInput').value.trim();
-        const category = document.getElementById('taskCategoryInput').value;
-        const priority = document.getElementById('taskPriorityInput').value;
-        const deadline = document.getElementById('taskDeadlineInput').value;
+    }
+
+
+
+    function saveTask(event) {
+
+        event.preventDefault();
+
+
+        const id =
+            document.getElementById(
+                "taskId"
+            ).value;
+
+
+        const title =
+            document.getElementById(
+                "taskTitleInput"
+            ).value.trim();
+
+
+        const description =
+            document.getElementById(
+                "taskDescInput"
+            ).value.trim();
+
+
+        const category =
+            document.getElementById(
+                "taskCategoryInput"
+            ).value;
+
+
+        const priority =
+            document.getElementById(
+                "taskPriorityInput"
+            ).value;
+
+
+        const deadline =
+            document.getElementById(
+                "taskDeadlineInput"
+            ).value;
+
+
+
+        /* ================= EDIT ================= */
 
         if (id) {
-          const task = tasks.find(t => t.id === id);
-          if (task) {
-            task.title = title;
-            task.description = description;
-            task.category = category;
-            task.priority = priority;
-            task.deadline = deadline;
-          }
-        } else {
-          tasks.push({
-            id: Date.now().toString(),
-            userEmail: currentUser.email,
-            title,
-            description,
-            category,
-            priority,
-            deadline,
-            status: 'todo'
-          });
+
+            const task =
+                tasks.find(
+                    t => t.id === id
+                );
+
+
+            if (task) {
+
+                task.title =
+                    title;
+
+                task.description =
+                    description;
+
+                task.category =
+                    category;
+
+                task.priority =
+                    priority;
+
+                task.deadline =
+                    deadline;
+
+            }
+
         }
 
-        TaskManagementModule.persistTasks();
+
+        /* ================= CREATE ================= */
+
+        else {
+
+            tasks.push({
+
+                id:
+                    Date.now().toString(),
+
+                userEmail:
+                    currentUser.email,
+
+                title:
+                    title,
+
+                description:
+                    description,
+
+                category:
+                    category,
+
+                priority:
+                    priority,
+
+                deadline:
+                    deadline,
+
+                /* NEW TASK STARTS HERE */
+
+                status:
+                    "todo"
+
+            });
+
+        }
+
+
+        TaskManagementModule.saveTasks();
+
         TaskManagementModule.renderTasks();
-        NotificationModule.checkNotifications();
+
         taskModal.hide();
-      }
 
-      return { openModal, saveTask };
-    })();
+    }
 
-    /* ==================== TASK MANAGEMENT & DRAG-AND-DROP MODULE ==================== */
-    const TaskManagementModule = (() => {
-      const defaultTasks = [
-        { id: '101', userEmail: 'user@example.com', title: 'Design homepage UI', description: 'Create responsive mockup using Bootstrap', category: 'Website Redesign', priority: 'High', deadline: '2026-10-05', status: 'completed' },
-        { id: '102', userEmail: 'user@example.com', title: 'Fix login validation bug', description: 'Ensure user input fields throw validation errors correctly', category: 'Mobile App', priority: 'High', deadline: '2026-10-02', status: 'in-progress' },
-        { id: '103', userEmail: 'user@example.com', title: 'Prepare client report', description: 'Compile weekly analytics into presentation slides', category: 'Marketing', priority: 'Medium', deadline: '2026-09-30', status: 'todo' }
-      ];
 
-      function init() {
+    return {
+
+        openModal,
+        saveTask
+
+    };
+
+})();
+
+
+
+/* =========================================================
+                 TASK MANAGEMENT MODULE
+========================================================= */
+
+const TaskManagementModule = (() => {
+
+
+    function init() {
+
         loadTasks();
+
         renderTasks();
-      }
 
-      function loadTasks() {
-        const saved = localStorage.getItem(TASKS_KEY);
-        tasks = saved ? JSON.parse(saved) : defaultTasks;
-      }
+    }
 
-      function persistTasks() {
-        localStorage.setItem(TASKS_KEY, JSON.stringify(tasks));
-      }
 
-      function renderTasks() {
-        const userTasks = tasks.filter(t => !t.userEmail || t.userEmail === currentUser.email);
-        const filteredTasks = selectedCategory === 'All' 
-          ? userTasks 
-          : userTasks.filter(t => t.category === selectedCategory);
 
-        ['todo', 'in-progress', 'completed'].forEach(status => {
-          const container = document.getElementById(`${status}-list`);
-          container.innerHTML = '';
+    function loadTasks() {
 
-          const columnTasks = filteredTasks.filter(t => t.status === status);
-          document.getElementById(`${status}-badge`).textContent = columnTasks.length;
+        const saved =
+            localStorage.getItem(
+                TASKS_KEY
+            );
 
-          columnTasks.forEach(task => {
-            container.appendChild(createCard(task));
-          });
+
+        tasks =
+            saved
+                ? JSON.parse(saved)
+                : [];
+
+    }
+
+
+
+    function saveTasks() {
+
+        localStorage.setItem(
+            TASKS_KEY,
+            JSON.stringify(tasks)
+        );
+
+    }
+
+
+
+    /* =====================================================
+                     RENDER TASKS
+    ===================================================== */
+
+    function renderTasks() {
+
+        const userTasks =
+            tasks.filter(
+                task =>
+                    task.userEmail ===
+                    currentUser.email
+            );
+
+
+        const filteredTasks =
+            selectedCategory === "All"
+
+                ? userTasks
+
+                : userTasks.filter(
+                    task =>
+                        task.category ===
+                        selectedCategory
+                );
+
+
+        const statuses = [
+            "todo",
+            "in-progress",
+            "completed"
+        ];
+
+
+        statuses.forEach(status => {
+
+            const container =
+                document.getElementById(
+                    status + "-list"
+                );
+
+
+            container.innerHTML = "";
+
+
+            const statusTasks =
+                filteredTasks.filter(
+                    task =>
+                        task.status === status
+                );
+
+
+            document.getElementById(
+                status + "-badge"
+            ).textContent =
+                statusTasks.length;
+
+
+            statusTasks.forEach(task => {
+
+                container.appendChild(
+                    createTaskCard(task)
+                );
+
+            });
+
         });
 
-        DashboardModule.updateMetrics(userTasks);
-      }
 
-      function createCard(task) {
-        const card = document.createElement('div');
-        card.className = 'card task-card p-3';
-        card.draggable = true;
-        card.dataset.id = task.id;
+        updateDashboard(userTasks);
 
-        const today = new Date();
-        today.setHours(0,0,0,0);
-        const deadlineDate = new Date(task.deadline);
-        const isOverdue = deadlineDate < today && task.status !== 'completed';
+    }
 
-        const priorityClass = `badge-${task.priority.toLowerCase()}`;
+
+
+    /* =====================================================
+                    CREATE TASK CARD
+    ===================================================== */
+
+    function createTaskCard(task) {
+
+        const card =
+            document.createElement("div");
+
+
+        card.className =
+            "task-card";
+
+
+        card.draggable =
+            true;
+
+
+        card.dataset.id =
+            task.id;
+
+
+
+        /* ================= PROGRESS ================= */
+
+        let progress = 0;
+
+        let progressColor = "bg-secondary";
+
+
+        if (task.status === "todo") {
+
+            progress = 0;
+
+            progressColor =
+                "bg-secondary";
+
+        }
+
+
+        if (task.status === "in-progress") {
+
+            progress = 50;
+
+            progressColor =
+                "bg-warning";
+
+        }
+
+
+        if (task.status === "completed") {
+
+            progress = 100;
+
+            progressColor =
+                "bg-success";
+
+        }
+
+
+
+        /* ================= PRIORITY ================= */
+
+        let priorityClass =
+            "bg-info";
+
+
+        if (task.priority === "High") {
+
+            priorityClass =
+                "priority-high";
+
+        }
+
+        else if (task.priority === "Medium") {
+
+            priorityClass =
+                "priority-medium";
+
+        }
+
+        else {
+
+            priorityClass =
+                "priority-low";
+
+        }
+
+
+
+        /* ================= BUTTONS ================= */
+
+        let actionButtons = "";
+
+
+        /* TODO */
+
+        if (task.status === "todo") {
+
+            actionButtons = `
+
+                <button
+                    class="btn btn-warning btn-sm"
+                    onclick="TaskManagementModule.startTask('${task.id}')">
+
+                    <i class="bi bi-play-fill"></i>
+                    Start Progress
+
+                </button>
+
+            `;
+
+        }
+
+
+        /* IN PROGRESS */
+
+        else if (task.status === "in-progress") {
+
+            actionButtons = `
+
+                <button
+                    class="btn btn-success btn-sm"
+                    onclick="TaskManagementModule.completeTask('${task.id}')">
+
+                    <i class="bi bi-check-lg"></i>
+                    Mark Complete
+
+                </button>
+
+            `;
+
+        }
+
+
+        /* COMPLETED */
+
+        else if (task.status === "completed") {
+
+            actionButtons = `
+
+                <button
+                    class="btn btn-secondary btn-sm"
+                    onclick="TaskManagementModule.reopenTask('${task.id}')">
+
+                    <i class="bi bi-arrow-counterclockwise"></i>
+                    Reopen
+
+                </button>
+
+            `;
+
+        }
+
+
+
+        /* ================= CARD HTML ================= */
 
         card.innerHTML = `
-          <div class="d-flex justify-content-between align-items-start mb-2">
-            <h6 class="fw-bold mb-0 text-dark">${task.title}</h6>
-            <span class="badge ${isOverdue ? 'bg-danger' : priorityClass}">${isOverdue ? 'Overdue' : task.priority}</span>
-          </div>
-          ${task.description ? `<p class="text-muted fs-7 mb-2">${task.description}</p>` : ''}
-          <div class="d-flex justify-content-between align-items-center fs-8 text-muted mb-2">
-            <span><i class="bi bi-folder me-1"></i>${task.category}</span>
-            <span class="${isOverdue ? 'text-danger fw-bold' : ''}"><i class="bi bi-calendar me-1"></i>${task.deadline}</span>
-          </div>
-          <div class="d-flex justify-content-end gap-1 border-top pt-2">
-            <button class="btn btn-sm btn-light text-primary py-0 px-2" onclick="TaskCreationModule.openModal('${task.id}')" title="Edit"><i class="bi bi-pencil"></i></button>
-            <button class="btn btn-sm btn-light text-danger py-0 px-2" onclick="TaskManagementModule.deleteTask('${task.id}')" title="Delete"><i class="bi bi-trash"></i></button>
-          </div>
+
+            <div class="d-flex
+                        justify-content-between
+                        align-items-start">
+
+                <h5 class="mb-1">
+                    ${task.title}
+                </h5>
+
+                <span class="badge ${priorityClass}">
+                    ${task.priority}
+                </span>
+
+            </div>
+
+
+            ${
+                task.description
+                ?
+                `<p class="text-muted small">
+                    ${task.description}
+                </p>`
+                :
+                ""
+            }
+
+
+            <div class="small text-muted mb-2">
+
+                <i class="bi bi-folder"></i>
+
+                ${task.category}
+
+            </div>
+
+
+            <div class="small mb-2">
+
+                <i class="bi bi-calendar"></i>
+
+                Deadline:
+                ${task.deadline}
+
+            </div>
+
+
+            <!-- TASK PROGRESS -->
+
+            <div class="d-flex
+                        justify-content-between
+                        small mb-1">
+
+                <strong>
+                    Task Progress
+                </strong>
+
+                <strong>
+                    ${progress}%
+                </strong>
+
+            </div>
+
+
+            <div class="progress mb-3">
+
+                <div
+                    class="progress-bar ${progressColor}"
+                    style="width:${progress}%">
+
+                </div>
+
+            </div>
+
+
+            <!-- ACTION BUTTONS -->
+
+            <div class="d-flex
+                        justify-content-between
+                        align-items-center
+                        flex-wrap
+                        gap-1">
+
+                <div>
+
+                    ${actionButtons}
+
+                </div>
+
+
+                <div>
+
+                    <button
+                        class="btn btn-light btn-sm"
+                        onclick="TaskCreationModule.openModal('${task.id}')">
+
+                        <i class="bi bi-pencil"></i>
+
+                    </button>
+
+
+                    <button
+                        class="btn btn-light text-danger btn-sm"
+                        onclick="TaskManagementModule.deleteTask('${task.id}')">
+
+                        <i class="bi bi-trash"></i>
+
+                    </button>
+
+                </div>
+
+            </div>
+
         `;
 
-        card.addEventListener('dragstart', (e) => {
-          e.dataTransfer.setData('text/plain', task.id);
-          card.classList.add('dragging');
-        });
 
-        card.addEventListener('dragend', () => card.classList.remove('dragging'));
+
+        /* =================================================
+                         DRAG AND DROP
+        ================================================= */
+
+        card.addEventListener(
+            "dragstart",
+            function(event) {
+
+                event.dataTransfer.setData(
+                    "text/plain",
+                    task.id
+                );
+
+            }
+        );
+
 
         return card;
-      }
 
-      function deleteTask(id) {
-        if (confirm('Are you sure you want to delete this task?')) {
-          tasks = tasks.filter(t => t.id !== id);
-          persistTasks();
-          renderTasks();
-          NotificationModule.checkNotifications();
+    }
+
+
+
+    /* =====================================================
+                     START TASK
+    ===================================================== */
+
+    function startTask(id) {
+
+        const task =
+            tasks.find(
+                t => t.id === id
+            );
+
+
+        if (!task) return;
+
+
+        task.status =
+            "in-progress";
+
+
+        saveTasks();
+
+        renderTasks();
+
+
+        showMessage(
+            "Task moved to In Progress."
+        );
+
+    }
+
+
+
+    /* =====================================================
+                    COMPLETE TASK
+    ===================================================== */
+
+    function completeTask(id) {
+
+        const task =
+            tasks.find(
+                t => t.id === id
+            );
+
+
+        if (!task) return;
+
+
+        task.status =
+            "completed";
+
+
+        saveTasks();
+
+        renderTasks();
+
+
+        showMessage(
+            "Task marked as completed!"
+        );
+
+    }
+
+
+
+    /* =====================================================
+                     REOPEN TASK
+    ===================================================== */
+
+    function reopenTask(id) {
+
+        const task =
+            tasks.find(
+                t => t.id === id
+            );
+
+
+        if (!task) return;
+
+
+        task.status =
+            "in-progress";
+
+
+        saveTasks();
+
+        renderTasks();
+
+
+        showMessage(
+            "Task moved back to In Progress."
+        );
+
+    }
+
+
+
+    /* =====================================================
+                       DELETE
+    ===================================================== */
+
+    function deleteTask(id) {
+
+        if (
+            !confirm(
+                "Are you sure you want to delete this task?"
+            )
+        ) {
+
+            return;
+
         }
-      }
 
-      function allowDrop(e) { e.preventDefault(); }
 
-      function drop(e, newStatus) {
-        e.preventDefault();
-        const id = e.dataTransfer.getData('text/plain');
-        const task = tasks.find(t => t.id === id);
-        if (task) {
-          task.status = newStatus;
-          persistTasks();
-          renderTasks();
-          NotificationModule.checkNotifications();
+        tasks =
+            tasks.filter(
+                task =>
+                    task.id !== id
+            );
+
+
+        saveTasks();
+
+        renderTasks();
+
+    }
+
+
+
+    /* =====================================================
+                    DRAG AND DROP
+    ===================================================== */
+
+    function allowDrop(event) {
+
+        event.preventDefault();
+
+    }
+
+
+
+    function drop(event, newStatus) {
+
+        event.preventDefault();
+
+
+        const id =
+            event.dataTransfer.getData(
+                "text/plain"
+            );
+
+
+        const task =
+            tasks.find(
+                t => t.id === id
+            );
+
+
+        if (!task) return;
+
+
+        task.status =
+            newStatus;
+
+
+        saveTasks();
+
+        renderTasks();
+
+
+        if (newStatus === "completed") {
+
+            showMessage(
+                "Task completed!"
+            );
+
         }
-      }
 
-      return { init, renderTasks, persistTasks, deleteTask, allowDrop, drop };
-    })();
+        else if (
+            newStatus === "in-progress"
+        ) {
 
-    /* ==================== DASHBOARD & PROGRESS MODULE ==================== */
-    const DashboardModule = (() => {
-      function updateMetrics(userTasks) {
-        const total = userTasks.length;
-        const completed = userTasks.filter(t => t.status === 'completed').length;
-        const pending = userTasks.filter(t => t.status === 'in-progress' || t.status === 'todo').length;
+            showMessage(
+                "Task is now in progress."
+            );
 
-        const today = new Date();
-        today.setHours(0,0,0,0);
-        const overdue = userTasks.filter(t => new Date(t.deadline) < today && t.status !== 'completed').length;
-
-        const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
-
-        document.getElementById('totalTasksCount').textContent = total;
-        document.getElementById('completedTasksCount').textContent = completed;
-        document.getElementById('pendingTasksCount').textContent = pending;
-        document.getElementById('overdueTasksCount').textContent = overdue;
-
-        document.getElementById('progressPercent').textContent = `${percent}%`;
-        document.getElementById('overallProgressBar').style.width = `${percent}%`;
-      }
-
-      return { updateMetrics };
-    })();
-
-    /* ==================== DEADLINE & NOTIFICATION MODULE ==================== */
-    const NotificationModule = (() => {
-      function checkNotifications() {
-        const container = document.getElementById('toastContainer');
-        container.innerHTML = '';
-
-        const today = new Date();
-        today.setHours(0,0,0,0);
-
-        let overdueCount = 0;
-        let dueSoonCount = 0;
-
-        tasks.filter(t => !t.userEmail || t.userEmail === currentUser.email).forEach(task => {
-          if (task.status === 'completed') return;
-
-          const deadline = new Date(task.deadline);
-          const diffDays = Math.ceil((deadline - today) / (1000 * 60 * 60 * 24));
-
-          if (diffDays < 0) {
-            overdueCount++;
-          } else if (diffDays >= 0 && diffDays <= 2) {
-            dueSoonCount++;
-          }
-        });
-
-        if (overdueCount > 0) {
-          showToast(`⚠️ You have ${overdueCount} overdue task(s)!`, 'danger');
         }
-        if (dueSoonCount > 0) {
-          showToast(`🔔 ${dueSoonCount} task(s) are due within the next 48 hours.`, 'warning');
-        }
-      }
 
-      function showToast(msg, bgType) {
-        const container = document.getElementById('toastContainer');
-        const toastEl = document.createElement('div');
-        toastEl.className = `toast align-items-center text-white bg-${bgType} border-0 show mb-2`;
-        toastEl.setAttribute('role', 'alert');
+    }
 
-        toastEl.innerHTML = `
-          <div class="d-flex">
-            <div class="toast-body fw-semibold">${msg}</div>
-            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-          </div>
-        `;
 
-        container.appendChild(toastEl);
 
-        setTimeout(() => {
-          toastEl.remove();
-        }, 5000);
-      }
+    return {
 
-      return { checkNotifications };
-    })();
-  </script>
+        init,
+        renderTasks,
+        saveTasks,
+        startTask,
+        completeTask,
+        reopenTask,
+        deleteTask,
+        allowDrop,
+        drop
+
+    };
+
+})();
+
+
+
+/* =========================================================
+                    DASHBOARD
+========================================================= */
+
+function updateDashboard(userTasks) {
+
+    const total =
+        userTasks.length;
+
+
+    const completed =
+        userTasks.filter(
+            task =>
+                task.status === "completed"
+        ).length;
+
+
+    const inProgress =
+        userTasks.filter(
+            task =>
+                task.status === "in-progress"
+        ).length;
+
+
+    const today =
+        new Date();
+
+    today.setHours(
+        0,0,0,0
+    );
+
+
+    const overdue =
+        userTasks.filter(
+            task =>
+                new Date(task.deadline) < today &&
+                task.status !== "completed"
+        ).length;
+
+
+    /* ================= PERCENTAGE ================= */
+
+    const percentage =
+        total === 0
+            ? 0
+            : Math.round(
+                (completed / total) * 100
+            );
+
+
+    document.getElementById(
+        "totalTasksCount"
+    ).textContent =
+        total;
+
+
+    document.getElementById(
+        "completedTasksCount"
+    ).textContent =
+        completed;
+
+
+    document.getElementById(
+        "pendingTasksCount"
+    ).textContent =
+        inProgress;
+
+
+    document.getElementById(
+        "overdueTasksCount"
+    ).textContent =
+        overdue;
+
+
+    document.getElementById(
+        "progressPercent"
+    ).textContent =
+        percentage + "%";
+
+
+    document.getElementById(
+        "overallProgressBar"
+    ).style.width =
+        percentage + "%";
+
+}
+
+
+
+/* =========================================================
+                    TOAST MESSAGE
+========================================================= */
+
+function showMessage(message) {
+
+    const container =
+        document.getElementById(
+            "toastContainer"
+        );
+
+
+    const toast =
+        document.createElement("div");
+
+
+    toast.className =
+        "alert alert-success shadow";
+
+
+    toast.textContent =
+        message;
+
+
+    container.appendChild(
+        toast
+    );
+
+
+    setTimeout(
+        function() {
+
+            toast.remove();
+
+        },
+        2500
+    );
+
+}
+
+</script>
+
+
 </body>
 </html>
